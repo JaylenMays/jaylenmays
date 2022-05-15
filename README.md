@@ -1,6 +1,8 @@
 <h1 align="center">Hi 👋, I'm Jaylen Mays</h1>
 <h3 align="center">I am a fullstack software engineer at 100Devs. Here, I primarily build full-stack web applications using HTML, CSS, JavaScript, React, Node.js and MongoDB. Through freelancing, I have helped empower businesses in my community who lack an online presence and technological expertise. Interested in astronomy and advanced computing.</h3>
 
+- 👨‍💻 All of my projects are available at [https://jaylenmays.netlify.app/](https://jaylenmays.netlify.app/)
+
 - 📫 How to reach me **jaylendmays@gmail.com**
 
 <h3 align="left">Connect with me:</h3>
