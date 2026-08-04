@@ -1,0 +1,334 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth & profile
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  settings        UserSettings?
+  degreePaths     DegreePath[]
+  lessonProgress  LessonProgress[]
+  quizAttempts    QuizAttempt[]
+  reviewCards     ReviewCard[]
+  studySessions   StudySession[]
+  studyTasks      StudyTask[]
+  conversations   TutorConversation[]
+  researchProjects ResearchProject[]
+  careerMilestones CareerMilestone[]
+  advisorImports  AdvisorImport[]
+  submissions     ChallengeSubmission[]
+}
+
+model UserSettings {
+  id                   String  @id @default(cuid())
+  userId               String  @unique
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aiProvider           String  @default("offline") // "anthropic" | "openai" | "offline"
+  aiModel              String  @default("claude-sonnet-5")
+  tutorStyle           String  @default("socratic") // "socratic" | "direct" | "detailed"
+  targetGpa            Float   @default(3.9)
+  weeklyStudyHoursGoal Int     @default(10)
+  dailyReviewGoal      Int     @default(20)
+  remindersEnabled     Boolean @default(true)
+  reminderHourUtc      Int     @default(13)
+}
+
+// ---------------------------------------------------------------------------
+// Degree roadmap
+// ---------------------------------------------------------------------------
+
+enum PathType {
+  PHYSICS_BS
+  APS_BS
+  CUSTOM_ASTROPHYSICS
+  GRAD_PREP
+  SETI_RESEARCH
+  QUANTUM_SECONDARY
+}
+
+enum CourseCategory {
+  MATH
+  PHYSICS
+  ASTRONOMY
+  PROGRAMMING
+  RESEARCH
+  QUANTUM
+  GENERAL
+}
+
+enum CourseStatus {
+  PLANNED
+  PREPARING
+  IN_PROGRESS
+  COMPLETED
+  TRANSFER
+}
+
+model DegreePath {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      PathType @default(CUSTOM_ASTROPHYSICS)
+  isActive  Boolean  @default(false)
+  notes     String?
+  createdAt DateTime @default(now())
+  courses   Course[]
+}
+
+model Course {
+  id             String         @id @default(cuid())
+  degreePathId   String
+  degreePath     DegreePath     @relation(fields: [degreePathId], references: [id], onDelete: Cascade)
+  code           String // e.g. "MAT 265"
+  title          String
+  category       CourseCategory @default(GENERAL)
+  credits        Float          @default(3)
+  semester       String? // "Fall" | "Spring" | "Summer"
+  year           Int?
+  sortOrder      Int            @default(0)
+  status         CourseStatus   @default(PLANNED)
+  grade          String? // earned letter grade
+  plannedGrade   String? // GPA-planner target grade
+  isTransfer     Boolean        @default(false)
+  isGradPrereq   Boolean        @default(false)
+  prerequisites  String[] // codes of prerequisite courses
+  prepSubjectKeys String[] // PrepModule keys that prepare for this course
+}
+
+// ---------------------------------------------------------------------------
+// Learning content
+// ---------------------------------------------------------------------------
+
+model PrepModule {
+  id          String         @id @default(cuid())
+  key         String         @unique // stable seed key, e.g. "calc1-prep"
+  title       String
+  description String
+  category    CourseCategory
+  sortOrder   Int            @default(0)
+  lessons     Lesson[]
+  questions   Question[]
+}
+
+model Lesson {
+  id               String     @id @default(cuid())
+  moduleId         String
+  module           PrepModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  slug             String     @unique
+  title            String
+  objectives       String[]
+  content          String // markdown
+  estimatedMinutes Int        @default(20)
+  sortOrder        Int        @default(0)
+  progress         LessonProgress[]
+  questions        Question[]
+}
+
+model LessonProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  status      String    @default("in_progress") // "in_progress" | "completed"
+  secondsSpent Int      @default(0)
+  completedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+model Question {
+  id           String     @id @default(cuid())
+  moduleId     String
+  module       PrepModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  lessonId     String?
+  lesson       Lesson?    @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  prompt       String
+  choices      String[]
+  correctIndex Int
+  explanation  String
+  difficulty   Int        @default(1) // 1-3
+  topic        String
+  answers      QuizAnswer[]
+}
+
+// ---------------------------------------------------------------------------
+// Quizzes & practice
+// ---------------------------------------------------------------------------
+
+model QuizAttempt {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  moduleKey   String
+  mode        String       @default("quiz") // "practice" | "quiz" | "exam"
+  startedAt   DateTime     @default(now())
+  completedAt DateTime?
+  score       Int          @default(0)
+  total       Int          @default(0)
+  answers     QuizAnswer[]
+}
+
+model QuizAnswer {
+  id            String      @id @default(cuid())
+  attemptId     String
+  attempt       QuizAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId    String
+  question      Question    @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  selectedIndex Int
+  isCorrect     Boolean
+}
+
+// ---------------------------------------------------------------------------
+// Spaced repetition (SM-2)
+// ---------------------------------------------------------------------------
+
+model ReviewCard {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  front        String
+  back         String
+  topic        String
+  easeFactor   Float       @default(2.5)
+  intervalDays Float       @default(0)
+  repetitions  Int         @default(0)
+  lapses       Int         @default(0)
+  dueAt        DateTime    @default(now())
+  createdAt    DateTime    @default(now())
+  logs         ReviewLog[]
+}
+
+model ReviewLog {
+  id         String     @id @default(cuid())
+  cardId     String
+  card       ReviewCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  rating     Int // 0-5 (SM-2 quality)
+  reviewedAt DateTime   @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Study tracking
+// ---------------------------------------------------------------------------
+
+model StudySession {
+  id      String   @id @default(cuid())
+  userId  String
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date    DateTime @default(now())
+  minutes Int
+  subject String   @default("general")
+}
+
+model StudyTask {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  kind      String    @default("study") // "study" | "review" | "quiz" | "reminder"
+  dueAt     DateTime?
+  completed Boolean   @default(false)
+  createdAt DateTime  @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// AI tutor
+// ---------------------------------------------------------------------------
+
+model TutorConversation {
+  id        String         @id @default(cuid())
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String         @default("New conversation")
+  context   String? // e.g. lesson slug or module key the chat is anchored to
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  messages  TutorMessage[]
+}
+
+model TutorMessage {
+  id             String            @id @default(cuid())
+  conversationId String
+  conversation   TutorConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String // "user" | "assistant"
+  content        String
+  createdAt      DateTime          @default(now())
+}
+
+// ---------------------------------------------------------------------------
+// Research, career, coding
+// ---------------------------------------------------------------------------
+
+model ResearchProject {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  area        String // "technosignatures" | "radio" | "signal-processing" | ...
+  description String
+  status      String   @default("active") // "active" | "paused" | "done"
+  progressPct Int      @default(0)
+  milestones  Json     @default("[]") // [{title, done}]
+  createdAt   DateTime @default(now())
+}
+
+model CareerMilestone {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  targetDate  DateTime?
+  completed   Boolean   @default(false)
+  sortOrder   Int       @default(0)
+}
+
+model AdvisorImport {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source    String   @default("paste") // "paste" | "dars"
+  rawText   String
+  summary   Json     @default("{}")
+  createdAt DateTime @default(now())
+}
+
+model CodingChallenge {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  title       String
+  track       String // "python" | "numpy" | "scipy" | "signal" | "ml" | "quantum"
+  prompt      String
+  starterCode String
+  solution    String
+  hints       String[]
+  sortOrder   Int      @default(0)
+  submissions ChallengeSubmission[]
+}
+
+model ChallengeSubmission {
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId String
+  challenge   CodingChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  code        String
+  status      String          @default("attempted") // "attempted" | "solved"
+  createdAt   DateTime        @default(now())
+}

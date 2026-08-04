@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 98%;
+    --foreground: 226 46% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 226 46% 12%;
+    --primary: 250 66% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 226 30% 93%;
+    --secondary-foreground: 226 40% 20%;
+    --muted: 226 30% 94%;
+    --muted-foreground: 226 15% 44%;
+    --accent: 250 60% 94%;
+    --accent-foreground: 250 60% 30%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 226 25% 88%;
+    --input: 226 25% 84%;
+    --ring: 250 66% 52%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 230 35% 7%;
+    --foreground: 220 30% 92%;
+    --card: 230 32% 10%;
+    --card-foreground: 220 30% 92%;
+    --primary: 252 80% 68%;
+    --primary-foreground: 230 35% 8%;
+    --secondary: 230 25% 16%;
+    --secondary-foreground: 220 25% 85%;
+    --muted: 230 25% 15%;
+    --muted-foreground: 224 15% 62%;
+    --accent: 252 40% 22%;
+    --accent-foreground: 252 70% 85%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 230 22% 20%;
+    --input: 230 22% 24%;
+    --ring: 252 80% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Markdown content inside lessons and tutor replies */
+.prose-app {
+  @apply text-sm leading-relaxed;
+}
+.prose-app h1 {
+  @apply mb-3 mt-6 text-xl font-bold first:mt-0;
+}
+.prose-app h2 {
+  @apply mb-2 mt-5 text-lg font-semibold first:mt-0;
+}
+.prose-app h3 {
+  @apply mb-2 mt-4 text-base font-semibold;
+}
+.prose-app p {
+  @apply mb-3;
+}
+.prose-app ul {
+  @apply mb-3 list-disc space-y-1 pl-5;
+}
+.prose-app ol {
+  @apply mb-3 list-decimal space-y-1 pl-5;
+}
+.prose-app code {
+  @apply rounded bg-muted px-1 py-0.5 font-mono text-[0.85em];
+}
+.prose-app pre {
+  @apply mb-3 overflow-x-auto rounded-md bg-muted p-3;
+}
+.prose-app pre code {
+  @apply bg-transparent p-0;
+}
+.prose-app blockquote {
+  @apply mb-3 border-l-2 border-primary/50 pl-3 italic text-muted-foreground;
+}
+.prose-app table {
+  @apply mb-3 w-full border-collapse text-sm;
+}
+.prose-app th,
+.prose-app td {
+  @apply border px-2 py-1 text-left;
+}
+.prose-app strong {
+  @apply font-semibold;
+}
+.prose-app a {
+  @apply text-primary underline underline-offset-2;
+}
