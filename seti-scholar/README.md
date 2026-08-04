@@ -8,6 +8,18 @@ server-graded quizzes, SM-2 spaced repetition, an AI tutor that knows your weak 
 editable multi-path degree roadmap, GPA planning, a research lab focused on technosignatures
 and radio astronomy, and a quantum-computing secondary track.
 
+## Screenshots
+
+Live captures from the running app (full gallery in [`docs/screenshots/`](docs/screenshots/)):
+
+| Mission Control | Auto-built curriculum | Mobile |
+|---|---|---|
+| ![Dashboard](docs/screenshots/02-dashboard.png) | ![Curriculum](docs/screenshots/05-curriculum-lessons.png) | ![Mobile](docs/screenshots/13-mobile-dashboard.png) |
+
+Also in the gallery: degree roadmap, Course Builder pipeline, book recommendations with
+licensing status, scored sources with selection history, Learning Studio lessons, AI tutor,
+spaced repetition, coding lab, and progress analytics.
+
 ## Stack
 
 | Layer | Technology |
