@@ -7,6 +7,8 @@
  * Vercel Cron, systemd timer) with `Authorization: Bearer $JOBS_SECRET`.
  */
 
+export {};
+
 const url = `${process.env.APP_URL ?? "http://localhost:3000"}/api/jobs/spaced-repetition`;
 const secret = process.env.JOBS_SECRET;
 

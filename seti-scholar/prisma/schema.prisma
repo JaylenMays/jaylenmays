@@ -332,3 +332,140 @@ model ChallengeSubmission {
   status      String          @default("attempted") // "attempted" | "solved"
   createdAt   DateTime        @default(now())
 }
+
+// ---------------------------------------------------------------------------
+// Autonomous knowledge & source discovery
+// ---------------------------------------------------------------------------
+
+model Source {
+  id           String   @id @default(cuid())
+  title        String
+  url          String
+  domain       String
+  provider     String // "openstax" | "openlibrary" | "crossref" | "arxiv" | "catalog" | ...
+  type         String // "textbook" | "course" | "lecture_notes" | "documentation" | "paper" | "video" | "simulation" | "dataset" | "problem_set"
+  subject      String
+  description  String   @default("")
+  license      String   @default("unknown")
+  accessStatus String   @default("metadata_only") // "open_full_text" | "preview" | "metadata_only" | "commercial"
+  openFullText Boolean  @default(false)
+  year         Int?
+  authors      String[] @default([])
+  scores       Json     @default("{}") // per-criterion rubric scores
+  qualityScore Float    @default(0)
+  status       String   @default("candidate") // "candidate" | "verified" | "selected" | "rejected" | "superseded"
+  claims       Json     @default("[]") // notable factual claims for contradiction checks
+  discoveredAt DateTime @default(now())
+  lastCheckedAt DateTime @default(now())
+  events       SourceEvent[]
+  citations    LessonCitation[]
+
+  @@unique([url, subject])
+}
+
+model SourceEvent {
+  id        String   @id @default(cuid())
+  sourceId  String
+  source    Source   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  kind      String // "discovered" | "scored" | "verified" | "selected" | "rejected" | "superseded" | "refreshed"
+  note      String
+  createdAt DateTime @default(now())
+}
+
+model Curriculum {
+  id             String   @id @default(cuid())
+  userId         String
+  courseCode     String
+  courseTitle    String
+  status         String   @default("draft") // "draft" | "published" | "superseded"
+  objectives     String[]
+  prereqConcepts String[]
+  sourceIds      String[]
+  runId          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  lessons        CurriculumLesson[]
+  books          BookRecommendation[]
+  contradictions Contradiction[]
+
+  @@unique([userId, courseCode])
+}
+
+model CurriculumLesson {
+  id                  String   @id @default(cuid())
+  curriculumId        String
+  curriculum          Curriculum @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  orderIdx            Int      @default(0)
+  kind                String   @default("lesson") // "lesson" | "diagnostic" | "readiness_exam" | "remediation"
+  title               String
+  objectives          String[]
+  prereqConcepts      String[]
+  originalExplanation String   @default("")
+  formalExplanation   String   @default("")
+  workedExamples      Json     @default("[]") // [{problem, steps[], answer}]
+  practiceProblems    Json     @default("[]") // [{prompt, answer, solution, validated, difficulty}]
+  commonMistakes      String[]
+  setiApplication     String   @default("")
+  masteryCriteria     String[]
+  followUp            Json     @default("[]") // [{title, url}]
+  qualityScore        Float    @default(0)
+  reviewStatus        String   @default("pending") // "pending" | "approved" | "revised" | "flagged"
+  reviewNotes         String   @default("")
+  writtenBy           String   @default("lesson-writer")
+  reviewedBy          String   @default("")
+  createdAt           DateTime @default(now())
+  citations           LessonCitation[]
+}
+
+model LessonCitation {
+  id       String @id @default(cuid())
+  lessonId String
+  lesson   CurriculumLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  sourceId String
+  source   Source @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  note     String @default("")
+}
+
+model BookRecommendation {
+  id               String  @id @default(cuid())
+  curriculumId     String
+  curriculum       Curriculum @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  title            String
+  author           String
+  edition          String  @default("")
+  year             Int?
+  subject          String
+  difficulty       String  @default("undergraduate") // "intro" | "undergraduate" | "advanced" | "graduate"
+  prereqLevel      String  @default("")
+  url              String
+  license          String  @default("unknown")
+  accessStatus     String  @default("metadata_only")
+  openFullText     Boolean @default(false)
+  relevantChapters String[]
+  rationale        String
+  role             String  @default("supplemental") // "primary" | "supplemental"
+  purchasePath     String  @default("") // legitimate purchase / library lookup URL
+}
+
+model Contradiction {
+  id           String  @id @default(cuid())
+  curriculumId String
+  curriculum   Curriculum @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  topic        String
+  description  String
+  resolution   String
+  sourceATitle String  @default("")
+  sourceBTitle String  @default("")
+}
+
+model PipelineRun {
+  id          String    @id @default(cuid())
+  userId      String
+  courseCode  String
+  status      String    @default("running") // "running" | "completed" | "failed"
+  currentStage String   @default("source-discovery")
+  log         Json      @default("[]") // [{stage, agent, status, summary, at}]
+  error       String    @default("")
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+}

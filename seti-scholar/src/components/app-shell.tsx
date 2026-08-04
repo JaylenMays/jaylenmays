@@ -23,6 +23,7 @@ import {
   X,
   Telescope,
   LogOut,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +31,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/roadmap", label: "Degree Roadmap", icon: Map },
   { href: "/prepare", label: "Course Preparation", icon: GraduationCap },
+  { href: "/builder", label: "Course Builder", icon: Bot },
   { href: "/studio", label: "Learning Studio", icon: BookOpen },
   { href: "/tutor", label: "AI Tutor", icon: Sparkles },
   { href: "/practice", label: "Practice Problems", icon: PencilRuler },

@@ -36,7 +36,12 @@ export default async function PreparePage() {
         <h1 className="text-2xl font-bold">Course Preparation</h1>
         <p className="text-sm text-muted-foreground">
           Learn the prerequisite knowledge for each course <em>before</em> you enroll. Readiness
-          blends lesson completion (55%) with demonstrated quiz mastery (45%).
+          blends lesson completion (55%) with demonstrated quiz mastery (45%). Want a full
+          source-cited curriculum built for a course automatically?{" "}
+          <Link href="/builder" className="text-primary underline underline-offset-2">
+            Open the Course Builder
+          </Link>
+          .
         </p>
       </div>
 

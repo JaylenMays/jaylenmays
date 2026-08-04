@@ -47,6 +47,60 @@ npm run dev                   # http://localhost:3000
 every new user is auto-provisioned with the full roadmap, starter flashcards, research
 project, and milestones.
 
+## Autonomous knowledge & source discovery
+
+SETI Scholar finds, evaluates, and cites its own legal learning materials — no textbook
+uploads required (uploads stay optional: syllabi, DARS reports, and advisor lists import via
+Advisor Plan Import).
+
+**Course Builder pipeline** (the required review chain, enforced in code):
+
+```
+Source Discovery → Source Verification → Curriculum Design → Lesson Generation
+→ Assessment Generation → Mathematical Validation → Scientific Accuracy Review
+→ Citation Validation → Publication
+```
+
+- **Agent roster**: Source Discovery, Source Verification, Curriculum Architect, Lesson
+  Writer, Assessment Generator, Mathematical Validator, Scientific Accuracy Reviewer,
+  Citation Agent, Personalization Agent, Mastery & Remediation Agent, Course Update Agent.
+  The agent that writes a lesson is never the only agent that verifies it — the reviewer is a
+  distinct agent and throws on any attempt to review its own writing; every published lesson
+  records `writtenBy` and `reviewedBy`.
+- **Discovery**: a curated catalog of vetted open resources (OpenStax, LibreTexts, MIT OCW,
+  OpenLearn, Feynman Lectures, NASA/ESA/NIST/NRAO/Green Bank/SETI Institute/Breakthrough
+  Listen, arXiv, official Python/NumPy/SciPy/Astropy/pandas/scikit-learn/Qiskit/Cirq/
+  PennyLane docs, Project Gutenberg) plus live metadata connectors (Open Library, Google
+  Books, Crossref, arXiv, Semantic Scholar) that augment it when the network allows and fail
+  gracefully when it doesn't — the app is fully autonomous offline.
+- **Source quality rubric**: every source is scored 0-100 across authority, relevance,
+  licensing, completeness, recency, clarity, citation quality, and level fit; per-criterion
+  scores are stored and shown in the UI. Selection requires multiple strong sources (never
+  one book) with type diversity. A full **source history** (discovered/scored/selected/
+  refreshed events) explains why each resource was chosen.
+- **Copyright policy, enforced in code** (`access-policy.ts` + tests): only approved domains
+  are ever stored; full text is treated as readable only with a verifiably open license; the
+  system stores metadata and its own original lessons, never copyrighted full text; access
+  status can never be upgraded to "open" without license evidence; commercial textbooks are
+  recommended as metadata with the rationale, relevant chapters, and a legitimate purchase/
+  library lookup path — no pirate sources, no paywall bypasses, ever.
+- **Generated curricula**: per course — objectives, prerequisite concepts, a diagnostic exam,
+  original lessons (conceptual + formal explanations, worked examples, machine-validated
+  practice problems, common mistakes, an astronomy/SETI application, mastery criteria,
+  follow-up resources, per-lesson citations with source quality), and a readiness exam
+  aligned to course outcomes.
+- **Mathematical validation**: a built-in expression engine + polynomial calculus module
+  independently re-derives every generated answer (and cross-checks symbolic derivatives
+  against difference quotients); problems that fail verification never reach the student.
+- **Contradiction handling**: documented disagreements between sources (e.g. the Hubble
+  constant tension, SI vs. Gaussian E&M units, drift-rate window assumptions in SETI
+  surveys) are surfaced with an explanation and practical guidance.
+- **Continuous operation** (`POST /api/jobs/autonomy`, cron-ready via
+  `npm run jobs:autonomy`): auto-builds curricula for upcoming courses, refreshes stale
+  source metadata, converts weak quiz topics into remediation lessons, schedules the next
+  day's study session, and posts a notice when readiness clears the bar to start the official
+  course. The user only chooses a degree path — the system handles the rest.
+
 ## The 15 sections
 
 1. **Dashboard** — mission control: readiness %, quiz accuracy, weakest topics, cards due, streak, weekly hours, target vs. projected GPA, upcoming tasks, recommended next lesson, research progress, career milestones, and charts.
@@ -64,6 +118,7 @@ project, and milestones.
 13. **Progress Analytics** — readiness radar by subject, quiz performance over time, weekly hours vs. goal, GPA projection, mastery ranked by module, topic-level accuracy.
 14. **Advisor Plan Import** — paste a DARS extract or advisor course list; the parser recognizes codes, titles, credits, grades, and terms (including `FA25`-style); preview, then import/merge into any path. Raw text is archived.
 15. **Settings & AI Configuration** — provider/model/teaching style, target GPA, weekly-hours and review goals, reminder toggle.
+16. **Course Builder** (`/builder`) — run the autonomous agent pipeline per course; browse generated curricula, book recommendations, scored sources with full selection history, and documented source disagreements.
 
 ## Spaced-repetition reminders (scheduled job)
 
