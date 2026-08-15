@@ -38,9 +38,10 @@ spaced repetition, coding lab, and progress analytics.
 
 The `windows/` folder has three double-clickable launchers:
 
-1. **`1 - First-Time Setup.bat`** — run once. Checks for Node.js and Docker Desktop
-   (pointing you at the installers if missing), installs everything, creates the database,
-   loads all content plus the official ASU degree plan, and builds the app.
+1. **`1 - First-Time Setup.bat`** — run once. The only prerequisite is Node.js (the script
+   points you at the installer if it's missing). It installs everything, creates a built-in
+   embedded PostgreSQL database (no Docker needed), loads all content plus the official ASU
+   degree plan, and builds the app.
 2. **`2 - Open SETI Scholar.bat`** — your everyday "open my app" button. Starts the
    database and server, then opens http://localhost:3000 in your browser.
    Right-click it → *Send to → Desktop (create shortcut)* and rename the shortcut

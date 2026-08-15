@@ -20,7 +20,9 @@
     "jobs:spaced-repetition": "tsx scripts/run-spaced-repetition-job.ts",
     "jobs:autonomy": "tsx scripts/run-autonomy-job.ts",
     "import:asu-map": "tsx scripts/import-asu-aps-map.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "app:setup": "tsx scripts/local-runner.ts setup",
+    "app:start": "tsx scripts/local-runner.ts start"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -60,6 +62,7 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "autoprefixer": "^10.4.20",
+    "embedded-postgres": "^18.4.0-beta.17",
     "postcss": "^8.5.1",
     "prisma": "^6.3.0",
     "tailwindcss": "^3.4.17",
