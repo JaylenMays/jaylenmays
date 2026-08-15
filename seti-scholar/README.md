@@ -34,6 +34,23 @@ spaced repetition, coding lab, and progress analytics.
 | Scheduling | Cron-friendly job endpoint for spaced-repetition reminders (no Redis required; see below) |
 | Tests | Vitest (31 unit tests) + Playwright (desktop + mobile e2e) |
 
+## Open it like an app on Windows
+
+The `windows/` folder has three double-clickable launchers:
+
+1. **`1 - First-Time Setup.bat`** — run once. Checks for Node.js and Docker Desktop
+   (pointing you at the installers if missing), installs everything, creates the database,
+   loads all content plus the official ASU degree plan, and builds the app.
+2. **`2 - Open SETI Scholar.bat`** — your everyday "open my app" button. Starts the
+   database and server, then opens http://localhost:3000 in your browser.
+   Right-click it → *Send to → Desktop (create shortcut)* and rename the shortcut
+   "SETI Scholar" for a true desktop-app feel.
+3. **`3 - Stop SETI Scholar.bat`** — shuts the server and database down (your data is kept).
+
+Prefer access from any device (phone included) without keeping your PC on?
+That's what the web deployment in [DEPLOY.md](DEPLOY.md) gives you — the two options
+work fine side by side.
+
 ## Deploying to the web
 
 See **[DEPLOY.md](DEPLOY.md)** — a 15-minute, browser-only walkthrough (Vercel + Neon free tiers)
