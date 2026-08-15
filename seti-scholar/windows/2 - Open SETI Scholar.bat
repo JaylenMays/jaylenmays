@@ -2,13 +2,18 @@
 title SETI Scholar
 cd /d "%~dp0\.."
 
-rem --- PostgreSQL refuses to run with admin rights; auto-drop elevation ----
+echo   SETI Scholar  [launcher v3]
+rem --- PostgreSQL cannot run with admin rights; drop elevation if present --
 net session >nul 2>&1
 if not errorlevel 1 (
-    echo Administrator mode detected - restarting without admin rights...
-    runas /trustlevel:0x20000 "cmd /c \"\"%~f0\"\""
+    echo   Administrator mode detected - relaunching with normal rights...
+    echo   ^(a new window will open - continue there^)
+    > "%TEMP%\seti_relaunch.cmd" echo @cd /d "%~dp0" ^& call "%~f0"
+    runas /trustlevel:0x20000 "%TEMP%\seti_relaunch.cmd"
     exit /b 0
 )
+echo   [running as normal user - good]
+echo.
 
 if not exist node_modules (
     echo [!] The app isn't installed yet.
@@ -23,7 +28,6 @@ if not exist .next (
 )
 if not exist .env copy .env.example .env >nul
 
-rem Start database + app server together (window stays open; errors visible there).
 start "SETI Scholar Server" /min cmd /k "npm run app:start"
 
 echo Starting SETI Scholar... waiting for the server...

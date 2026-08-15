@@ -2,18 +2,20 @@
 title SETI Scholar - First-Time Setup
 cd /d "%~dp0\.."
 
-rem --- PostgreSQL refuses to run with admin rights; auto-drop elevation ----
-net session >nul 2>&1
-if not errorlevel 1 (
-    echo Administrator mode detected - restarting without admin rights...
-    runas /trustlevel:0x20000 "cmd /c \"\"%~f0\"\""
-    exit /b 0
-)
-
 echo ============================================
-echo   SETI Scholar - one-time setup
+echo   SETI Scholar - one-time setup  [launcher v3]
 echo   (only requirement: Node.js)
 echo ============================================
+rem --- PostgreSQL cannot run with admin rights; drop elevation if present --
+net session >nul 2>&1
+if not errorlevel 1 (
+    echo   Administrator mode detected - relaunching with normal rights...
+    echo   ^(a new window will open - continue there^)
+    > "%TEMP%\seti_relaunch.cmd" echo @cd /d "%~dp0" ^& call "%~f0"
+    runas /trustlevel:0x20000 "%TEMP%\seti_relaunch.cmd"
+    exit /b 0
+)
+echo   [running as normal user - good]
 echo.
 
 where node >nul 2>nul
@@ -44,7 +46,6 @@ echo.
 echo ============================================
 echo   Setup complete!
 echo   Double-click "2 - Open SETI Scholar.bat" to use the app.
-echo   (right-click it and "Send to Desktop" for a shortcut)
 echo ============================================
 pause
 exit /b 0
