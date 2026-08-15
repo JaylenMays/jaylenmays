@@ -10,7 +10,7 @@
  */
 
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import path from "node:path";
 import EmbeddedPostgres from "embedded-postgres";
 
@@ -42,6 +42,8 @@ function run(cmd: string, args: string[], extraEnv: Record<string, string> = {})
 
 async function ensureCluster() {
   if (!existsSync(path.join(DATA_DIR, "PG_VERSION"))) {
+    // A failed earlier init can leave a partial data dir that blocks initdb.
+    if (existsSync(DATA_DIR)) rmSync(DATA_DIR, { recursive: true, force: true });
     console.log("[db] Initialising embedded PostgreSQL cluster…");
     await pg.initialise();
   }
@@ -107,6 +109,15 @@ if (!main) {
   process.exit(1);
 }
 main().catch((err) => {
-  console.error(err);
+  const message = err instanceof Error ? err.message : String(err);
+  if (message.includes("administrative permissions")) {
+    console.error(
+      "\n[!] PostgreSQL refuses to run with administrator rights." +
+        "\n    Close this window and double-click the launcher NORMALLY" +
+        "\n    (do not use 'Run as administrator').\n",
+    );
+  } else {
+    console.error(message);
+  }
   process.exit(1);
 });

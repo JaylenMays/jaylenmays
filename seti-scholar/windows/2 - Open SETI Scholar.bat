@@ -2,6 +2,14 @@
 title SETI Scholar
 cd /d "%~dp0\.."
 
+rem --- PostgreSQL refuses to run with admin rights; auto-drop elevation ----
+net session >nul 2>&1
+if not errorlevel 1 (
+    echo Administrator mode detected - restarting without admin rights...
+    runas /trustlevel:0x20000 "cmd /c \"\"%~f0\"\""
+    exit /b 0
+)
+
 if not exist node_modules (
     echo [!] The app isn't installed yet.
     echo     Run "1 - First-Time Setup.bat" first ^(one time only^), then try again.
