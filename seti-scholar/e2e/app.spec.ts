@@ -27,7 +27,12 @@ test("login → dashboard → core sections", async ({ page }) => {
   // Roadmap
   await page.goto("/roadmap");
   await expect(page.getByRole("heading", { name: "Degree Roadmap" })).toBeVisible();
-  await expect(page.getByText("Astrophysics Preparation Pathway").first()).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /Astrophysics Preparation Pathway/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /ASU APS \(Astrophysics\) BS — Official/ }),
+  ).toBeVisible();
 
   // Learning studio
   await page.goto("/studio");

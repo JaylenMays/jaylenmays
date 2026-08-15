@@ -338,7 +338,7 @@ export const SUBJECT_PROFILES: SubjectProfile[] = [
   },
   {
     key: "linear-algebra",
-    match: ["mat 342", "linear algebra"],
+    match: ["mat 342", "linear algebra", "phy 201", "phy 202", "mathematical methods"],
     keywords: ["linear algebra", "matrix", "vector", "eigenvalue", "transformation"],
     objectives: [
       "Solve linear systems with Gaussian elimination",
@@ -736,7 +736,7 @@ export const SUBJECT_PROFILES: SubjectProfile[] = [
   },
   {
     key: "quantum-modern",
-    match: ["phy 201", "modern physics", "phy 314", "quantum mechanics", "phy 441", "statistical", "thermodynamics", "phy 320"],
+    match: ["modern physics", "phy 314", "quantum mechanics", "phy 441", "statistical", "thermodynamics", "phy 320", "phy 241", "university physics iii"],
     keywords: ["quantum", "relativity", "photon", "wavefunction", "modern physics", "thermodynamics", "entropy"],
     objectives: [
       "Apply special relativity: time dilation, length contraction, E = mc²",
@@ -853,7 +853,7 @@ export const SUBJECT_PROFILES: SubjectProfile[] = [
   },
   {
     key: "astronomy-intro",
-    match: ["ast 111", "ast 112", "ast 113", "introduction to astronomy", "solar system", "stars, galaxies"],
+    match: ["ast 111", "ast 112", "ast 113", "ast 321", "ast 322", "ast 421", "ses 106", "ses 350", "ses 376", "ses 377", "ses 421", "introduction to astronomy", "solar system", "stars, galaxies", "habitable worlds", "astrophysics"],
     keywords: ["astronomy", "stars", "planets", "telescopes", "spectra", "orbits", "galaxies"],
     objectives: [
       "Use scientific notation and astronomical distance units fluently",

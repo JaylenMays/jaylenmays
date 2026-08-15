@@ -29,7 +29,15 @@ export interface CourseTemplate {
   prerequisites: string[];
   prepSubjectKeys: string[];
   isGradPrereq?: boolean;
+  // Optional term placement / completion data (used by the official ASU map).
+  semester?: "Fall" | "Spring" | "Summer";
+  year?: number;
+  grade?: string;
+  isTransfer?: boolean;
+  status?: "PLANNED" | "PREPARING" | "IN_PROGRESS" | "COMPLETED" | "TRANSFER";
 }
+
+import { ASU_APS_PATH, ASU_APS_REMAINING, ASU_TRANSFER_CREDITS } from "./asu-aps-map";
 
 export interface PathTemplate {
   name: string;
@@ -107,9 +115,9 @@ export const PATH_TEMPLATES: PathTemplate[] = [
   {
     name: "Astrophysics Preparation Pathway",
     type: "CUSTOM_ASTROPHYSICS",
-    isActive: true,
+    isActive: false,
     notes:
-      "Customized preparation pathway toward SETI astrophysics. Subject equivalents — swap in exact ASU course numbers once advising confirms the degree plan.",
+      "Customized preparation pathway toward SETI astrophysics — supplemental subject equivalents beyond the official ASU degree plan.",
     courses: [...MATH_CORE, ...PHYSICS_CORE, ...ASTRO_CORE, ...PROGRAMMING_CORE],
   },
   {
@@ -126,16 +134,31 @@ export const PATH_TEMPLATES: PathTemplate[] = [
     ],
   },
   {
-    name: "ASU Online Astronomical & Planetary Sciences BS (draft)",
+    name: ASU_APS_PATH.name,
     type: "APS_BS",
-    isActive: false,
-    notes:
-      "Draft plan modeled on the ASU Online Astronomical & Planetary Sciences BS. Confirm exact requirements with your ASU advisor.",
+    isActive: true,
+    notes: ASU_APS_PATH.notes,
     courses: [
-      ...MATH_CORE.filter((c) => ["MAT 117", "MAT 170", "MAT 265", "MAT 266", "STP 420"].includes(c.code)),
-      ...PHYSICS_CORE.filter((c) => ["PHY 121", "PHY 131", "PHY 201"].includes(c.code)),
-      ...ASTRO_CORE,
-      ...PROGRAMMING_CORE.slice(0, 2),
+      ...ASU_TRANSFER_CREDITS.map(
+        (t): CourseTemplate => ({
+          code: t.code,
+          title: `${t.title} — satisfies: ${t.satisfies}`,
+          category: t.code.startsWith("MAT")
+            ? "MATH"
+            : t.code.startsWith("AST")
+              ? "ASTRONOMY"
+              : "GENERAL",
+          credits: t.credits,
+          prerequisites: [],
+          prepSubjectKeys: [],
+          semester: t.semester,
+          year: t.year,
+          grade: t.grade,
+          isTransfer: true,
+          status: "TRANSFER",
+        }),
+      ),
+      ...ASU_APS_REMAINING,
     ],
   },
   {
