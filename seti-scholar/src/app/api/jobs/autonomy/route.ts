@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { runAutonomyForAllUsers } from "@/lib/agents/autonomy";
+import { jobRequestAuthorized } from "@/lib/jobs-auth";
 
 export const maxDuration = 300;
 
@@ -9,10 +10,8 @@ export const maxDuration = 300;
  * schedules the next study session, and posts readiness notices.
  * Schedule alongside /api/jobs/spaced-repetition (cron, Vercel Cron, etc.).
  */
-export async function POST(req: Request) {
-  const secret = process.env.JOBS_SECRET;
-  const header = req.headers.get("authorization");
-  if (!secret || header !== `Bearer ${secret}`) {
+async function handle(req: Request) {
+  if (!jobRequestAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const reports = await runAutonomyForAllUsers();
@@ -25,3 +24,7 @@ export async function POST(req: Request) {
     tasksCreated: reports.reduce((a, r) => a + r.tasksCreated, 0),
   });
 }
+
+// Vercel Cron invokes GET; manual schedulers may POST.
+export const GET = handle;
+export const POST = handle;

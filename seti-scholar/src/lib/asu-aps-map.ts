@@ -43,7 +43,8 @@ export const ASU_TRANSFER_CREDITS: TransferCredit[] = [
  */
 export const ASU_APS_REMAINING: CourseTemplate[] = [
   // ---- Term 1 · Fall 2026 -------------------------------------------------
-  { code: "MAT 265", title: "Calculus for Engineers I (C minimum)", category: "MATH", credits: 3, prerequisites: ["MAT 170"], prepSubjectKeys: ["calc1-prep"], isGradPrereq: true, semester: "Fall", year: 2026 },
+  // First critical requirement — provisioned as the current focus by default.
+  { code: "MAT 265", title: "Calculus for Engineers I (C minimum)", category: "MATH", credits: 3, prerequisites: ["MAT 170"], prepSubjectKeys: ["calc1-prep"], isGradPrereq: true, semester: "Fall", year: 2026, status: "PREPARING" },
   { code: "AST 111", title: "Introduction to Solar Systems Astronomy (C minimum)", category: "ASTRONOMY", credits: 4, prerequisites: [], prepSubjectKeys: ["astronomy-prep"], semester: "Fall", year: 2026 },
   // ---- Term 2 · Spring 2027 ----------------------------------------------
   { code: "AST 112", title: "Introduction to Stars, Galaxies & the Universe (C minimum)", category: "ASTRONOMY", credits: 4, prerequisites: [], prepSubjectKeys: ["astronomy-prep", "stellar-prep"], semester: "Spring", year: 2027 },

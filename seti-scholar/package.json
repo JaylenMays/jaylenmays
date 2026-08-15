@@ -19,7 +19,8 @@
     "db:studio": "prisma studio",
     "jobs:spaced-repetition": "tsx scripts/run-spaced-repetition-job.ts",
     "jobs:autonomy": "tsx scripts/run-autonomy-job.ts",
-    "import:asu-map": "tsx scripts/import-asu-aps-map.ts"
+    "import:asu-map": "tsx scripts/import-asu-aps-map.ts",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

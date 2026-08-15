@@ -34,6 +34,11 @@ spaced repetition, coding lab, and progress analytics.
 | Scheduling | Cron-friendly job endpoint for spaced-repetition reminders (no Redis required; see below) |
 | Tests | Vitest (31 unit tests) + Playwright (desktop + mobile e2e) |
 
+## Deploying to the web
+
+See **[DEPLOY.md](DEPLOY.md)** — a 15-minute, browser-only walkthrough (Vercel + Neon free tiers)
+ending with a permanent URL, scheduled autonomy/review crons, and one-visit database bootstrap.
+
 ## Quick start
 
 ```bash

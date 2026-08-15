@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { jobRequestAuthorized } from "@/lib/jobs-auth";
 
 /**
  * Scheduled-job endpoint (call from cron, GitHub Actions, or `npm run
@@ -7,10 +8,8 @@ import { db } from "@/lib/db";
  * review StudyTask when cards are due, keeping the spaced-repetition loop alive
  * without requiring Redis. Authorized via the JOBS_SECRET bearer token.
  */
-export async function POST(req: Request) {
-  const secret = process.env.JOBS_SECRET;
-  const header = req.headers.get("authorization");
-  if (!secret || header !== `Bearer ${secret}`) {
+async function handle(req: Request) {
+  if (!jobRequestAuthorized(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -52,3 +51,7 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true, usersProcessed: users.length, remindersCreated: created });
 }
+
+// Vercel Cron invokes GET; manual schedulers may POST.
+export const GET = handle;
+export const POST = handle;

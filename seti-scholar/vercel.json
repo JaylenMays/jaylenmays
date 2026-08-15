@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npx prisma generate && npx prisma db push --skip-generate && next build",
+  "crons": [
+    { "path": "/api/jobs/spaced-repetition", "schedule": "0 13 * * *" },
+    { "path": "/api/jobs/autonomy", "schedule": "0 5 * * *" }
+  ]
+}
