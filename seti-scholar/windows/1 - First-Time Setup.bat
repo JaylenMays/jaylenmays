@@ -1,17 +1,27 @@
 @echo off
 title SETI Scholar - First-Time Setup
+echo ============================================
+echo   SETI Scholar - one-time setup  [launcher v4]
+echo ============================================
+rem --- Find the app no matter where this file is run from ------------------
 cd /d "%~dp0\.."
+if not exist package.json (
+    if exist "G:\Projects\seti-scholar\package.json" (
+        cd /d "G:\Projects\seti-scholar"
+    ) else (
+        echo [!] Can't find the app. Expected it at G:\Projects\seti-scholar
+        echo     ^(this launcher also works when placed inside the app's windows folder^)
+        pause
+        exit /b 1
+    )
+)
 
-echo ============================================
-echo   SETI Scholar - one-time setup  [launcher v3]
-echo   (only requirement: Node.js)
-echo ============================================
 rem --- PostgreSQL cannot run with admin rights; drop elevation if present --
 net session >nul 2>&1
 if not errorlevel 1 (
     echo   Administrator mode detected - relaunching with normal rights...
     echo   ^(a new window will open - continue there^)
-    > "%TEMP%\seti_relaunch.cmd" echo @cd /d "%~dp0" ^& call "%~f0"
+    > "%TEMP%\seti_relaunch.cmd" echo @call "%~f0"
     runas /trustlevel:0x20000 "%TEMP%\seti_relaunch.cmd"
     exit /b 0
 )
@@ -20,8 +30,7 @@ echo.
 
 where node >nul 2>nul
 if errorlevel 1 (
-    echo [!] Node.js is not installed yet.
-    echo     Install it ^(the .msi Claude sent, or nodejs.org^), then run this again.
+    echo [!] Node.js is not installed yet - install it, then run this again.
     start https://nodejs.org
     pause
     exit /b 1
@@ -44,8 +53,7 @@ if errorlevel 1 goto :fail
 
 echo.
 echo ============================================
-echo   Setup complete!
-echo   Double-click "2 - Open SETI Scholar.bat" to use the app.
+echo   Setup complete! Now run "2 - Open SETI Scholar.bat"
 echo ============================================
 pause
 exit /b 0
